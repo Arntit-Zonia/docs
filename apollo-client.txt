@@ -1,0 +1,86 @@
+- gql is used to create queries
+- query is similar to get (used to view data)
+- mutation is similar to post/put (used to update data)
+
+import { gql } from '@apollo/client';
+
+query example without arguments:
+
+const GET_CHARACTERS = gql`
+    query {
+        characters {
+            results {
+                id
+                name
+                image
+            }
+        }
+    }
+`;
+
+query example with arguments:
+
+const GET_CHARACTER = gql`
+    query getCharacter($id: ID!){
+        character(id: $id) {
+            id
+            name
+            image
+            episode {
+                name
+                episode
+            }
+        }
+    }
+`;
+
+- mutation example
+
+const ADD_STR = gql`
+    mutation addStr($str: String!){
+        createStr(entry: { value: $str }) {
+            entries {
+                value
+            }
+        }
+    }
+`;
+
+- useQuery runs on component load
+- returns an object
+- use with custom hooks
+
+import { useQuery } from '@apollo/client';
+
+example without arguments:
+
+export const useCharacters = () => {
+    const { error, loading, data } = useQuery(GET_CHARACTERS);
+
+    return { error, loading, data };
+}
+
+example with arguments:
+
+export const useCharacter = (id: string) => {
+    const { error, loading, data } = useQuery(GET_CHARACTER, { variables: { id } });
+
+    return { error, loading, data };
+}
+
+- useLazyQuery only runs when it's envoked
+- returns an array
+- first arg is a function used to initiate the query (can have any name)
+- second arg is the usual obj with the addition of a called prop (tracks if the query was initiated or not)
+
+import { useLazyQuery, gql } from '@apollo/client';
+
+const [handleSearch, { error, loading, data, called }] = useLazyQuery(GET_SEARCH_CHARACTER, { variables: { name } });
+
+- useMutation has a similar structure to useLazyQuery
+
+import { useMutation } from '@apollo/client';
+
+const [uploadEntry, { error, loading, data, called }] = useMutation(ADD_STR);
+
+<button onClick={() => uploadEntry({ variables: { str } })}></button>
